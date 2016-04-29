@@ -1,23 +1,23 @@
 rankODIBowlers <- function() {
     
-    setwd("C:/software/cricket-package/york-test/yorkrData/ODI/ODI-matches")
-    afg_details <- getTeamBowlingDetails("Afghanistan",dir=".", save=TRUE)
-    aus_details <- getTeamBowlingDetails("Australia",dir=".", save=TRUE)
-    ind_details <- getTeamBowlingDetails("India",dir=".",save=TRUE)
-    pak_details <- getTeamBowlingDetails("Pakistan",dir=".",save=TRUE)
-    wi_details <- getTeamBowlingDetails("West Indies",dir=".",save=TRUE)
-    sl_details <- getTeamBowlingDetails("Sri Lanka",dir=".",save=TRUE)
-    eng_details <- getTeamBowlingDetails("England",dir=".",save=TRUE)
-    ban_details <- getTeamBowlingDetails("Bangladesh",dir=".",save=TRUE)
-    nth_details <- getTeamBowlingDetails("Netherlands",dir=".",save=TRUE)
-    sco_details <- getTeamBowlingDetails("Scotland",dir=".",save=TRUE)
-    zim_details <- getTeamBowlingDetails("Zimbabwe",dir=".",save=TRUE)
-    ire_details <- getTeamBowlingDetails("Ireland",dir=".",save=TRUE)
-    nz_details <- getTeamBowlingDetails("New Zealand",dir=".",save=TRUE)
-    sa_details <- getTeamBowlingDetails("South Africa",dir=".",save=TRUE)
-    can_details <- getTeamBowlingDetails("Canada",dir=".",save=TRUE)
-    ber_details <- getTeamBowlingDetails("Bermuda",dir=".",save=TRUE)
-    ken_details <- getTeamBowlingDetails("Kenya",dir=".",save=TRUE)
+    #setwd("C:/software/cricket-package/york-test/yorkrData/ODI/ODI-matches")
+    #afg_details <- getTeamBowlingDetails("Afghanistan",dir=".", save=TRUE)
+    #aus_details <- getTeamBowlingDetails("Australia",dir=".", save=TRUE)
+    #ind_details <- getTeamBowlingDetails("India",dir=".",save=TRUE)
+    #pak_details <- getTeamBowlingDetails("Pakistan",dir=".",save=TRUE)
+    #wi_details <- getTeamBowlingDetails("West Indies",dir=".",save=TRUE)
+    #sl_details <- getTeamBowlingDetails("Sri Lanka",dir=".",save=TRUE)
+    #eng_details <- getTeamBowlingDetails("England",dir=".",save=TRUE)
+    #ban_details <- getTeamBowlingDetails("Bangladesh",dir=".",save=TRUE)
+    #nth_details <- getTeamBowlingDetails("Netherlands",dir=".",save=TRUE)
+    #sco_details <- getTeamBowlingDetails("Scotland",dir=".",save=TRUE)
+    #zim_details <- getTeamBowlingDetails("Zimbabwe",dir=".",save=TRUE)
+    #ire_details <- getTeamBowlingDetails("Ireland",dir=".",save=TRUE)
+    #nz_details <- getTeamBowlingDetails("New Zealand",dir=".",save=TRUE)
+    #sa_details <- getTeamBowlingDetails("South Africa",dir=".",save=TRUE)
+    #can_details <- getTeamBowlingDetails("Canada",dir=".",save=TRUE)
+    #ber_details <- getTeamBowlingDetails("Bermuda",dir=".",save=TRUE)
+    #ken_details <- getTeamBowlingDetails("Kenya",dir=".",save=TRUE)
     
     load("Afghanistan-BowlingDetails.RData")
     afg_details <- bowlingDetails
@@ -64,9 +64,6 @@ rankODIBowlers <- function() {
               "Zimbabwe","Ireland","New Zealand","South Africa","Canada",
               "Bermuda","Kenya")
     
-    
-    
-    
 
     o <- data.frame(bowler=character(0),wickets=numeric(0),economyRate=numeric(0))
     for(x in 1:length(aa)){
@@ -79,34 +76,21 @@ rankODIBowlers <- function() {
                          
                      }
                      
-            )
+           )
             if(exists("l")){
-            
-               m <- select(l,bowler,wickets,economyRate)
-               o <-rbind(o,m)
+               l1 <- l %>% group_by(bowler,wickets,economyRate) %>%  distinct(date)
+               l2 <-summarise(group_by(l1,bowler),matches=n(),meanWickets=mean(wickets),
+                                 meanER=mean(economyRate))
+              
+               o <-rbind(o,l2)
             }
             
         }
     }
-    print(dim(o))
-    bowlers <- unique(o$bowler)
-    print(getwd())
-    u <- NULL
-    s <- data.frame(bowler=character(0),matches=numeric(0),meanWickets=numeric(0),meanER=numeric(0))
-    for (x in 1:length(bowlers)){
-        m <- filter(o,bowler==bowlers[x])
-        m <- mutate(m,matches=n(),meanWickets=mean(wickets),meanER=mean(economyRate))
-        m <- select(m,bowler,matches,meanWickets,meanER)
-        s <- m[1,]
-        u <- rbind(u,s)
-    }
-    
-    # Select only players who have played 60 matches or more
-    q <- filter(u,matches >= 50)
-    
+   
+    q <- filter(o,matches >= 20)
     ODIBowlersRank <- arrange(q,desc(meanWickets),desc(meanER))
     ODIBowlersRank
-    
     
     
 }
